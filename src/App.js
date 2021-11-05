@@ -1,5 +1,7 @@
 import { Component } from "react";
 import "./App.css";
+
+import Searchbar from "./components/Searchbar";
 import Modal from "./components/Modal";
 
 class App extends Component {
@@ -12,14 +14,16 @@ class App extends Component {
       showModal: !state.showModal,
     }));
   };
+
+  Searchbar = () => {
+    console.log("Searchbar");
+  };
   render() {
     return (
       <div className="App">
-        <button type="button" onClick={this.toggleModal}>
-          Открыть модалку
-        </button>
+        <Searchbar onSubmit={this.Searchbar} />
         {this.state.showModal && (
-          <Modal>
+          <Modal onClose={this.toggleModal}>
             <h1>то что будет отображено в модалке</h1>
             <p>
               loremloremlorem loremloremlorem loremloremloreml oremloremlorem
@@ -30,6 +34,9 @@ class App extends Component {
             </button>
           </Modal>
         )}
+        <button type="button" onClick={this.toggleModal}>
+          Открыть модалку
+        </button>
       </div>
     );
   }
