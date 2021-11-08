@@ -4,10 +4,8 @@ import "./App.css";
 import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 import Searchbar from "./components/Searchbar";
 import ImageGallery from "./components/ImageGallery";
-import Button from "./components/Button";
 
 // модалку приспособить
-import Modal from "./components/Modal";
 
 // компонент для тренировки
 import Test from "./components/Test/Test";
@@ -18,23 +16,14 @@ class App extends Component {
   state = {
     requestValue: "",
 
-    showModal: false,
+    // showModal: false,
   };
 
-  // componentDidMount() {
-  //   fetch(
-  //     `https://pixabay.com/api/?q=${this.state.searchValue}&page=${this.state.pageNumber}&key=${MY_API_KEY}&image_type=photo&orientation=horizontal&per_page=12`,
-  //   )
-  //     .then((res) => res.json())
-  //     .then((arr) => this.setState({ arrImages: arr }))
-  //     .finally(() => this.setState())
+  // toggleModal = () => {
+  //   this.setState((state) => ({
+  //     showModal: !state.showModal,
+  //   }))
   // }
-
-  toggleModal = () => {
-    this.setState((state) => ({
-      showModal: !state.showModal,
-    }));
-  };
 
   handleFormSubmit = (requestValue) => {
     this.setState({ requestValue });
@@ -45,29 +34,24 @@ class App extends Component {
       <div className="App">
         <Test />
         <Searchbar onSubmit={this.handleFormSubmit} />
-
         <ImageGallery
           requestValue={this.state.requestValue}
           keyApi={MY_API_KEY}
         />
-        <Button />
-
-        {this.state.showModal && (
+        {/* <Button /> */}
+        {/* {this.state.showModal && (
           <Modal onClose={this.toggleModal}>
             <h1>то что будет отображено в модалке</h1>
             <p>
               loremloremlorem loremloremlorem loremloremloreml oremloremlorem
             </p>
-            <button type="button" onClick={this.toggleModal}>
-              X
-            </button>
-          </Modal>
-        )}
-        <ToastContainer autoClose={2500} />
 
-        <button type="button" onClick={this.toggleModal}>
+          </Modal>
+        )} */}
+        <ToastContainer autoClose={2500} />
+        {/* <button type="button" onClick={this.toggleModal}>
           Открыть модалку
-        </button>
+        </button> */}
       </div>
     );
   }
