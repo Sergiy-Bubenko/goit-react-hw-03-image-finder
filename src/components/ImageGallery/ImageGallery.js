@@ -3,6 +3,9 @@ import Loader from "react-loader-spinner";
 import ImageGalleryItem from "../ImageGalleryItem";
 import Button from "../Button";
 import Modal from "../Modal";
+import PropTypes from "prop-types";
+
+const MY_API_KEY = "23246580-47279d47050c78840bfc8f048";
 
 class ImageGallery extends Component {
   state = {
@@ -10,31 +13,21 @@ class ImageGallery extends Component {
     arrImages: [],
     error: null,
     status: "idle",
-    showModal: false,
     modalImage: "",
+    showModal: false,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    // console.log(prevProps)
-    // console.log('prevState', prevState)
-    // console.log('this.state', this.state)
-
     if (prevProps.requestValue !== this.props.requestValue) {
       this.setState({
         status: "pending",
         pageNumber: 1,
       });
-      // onRequest = () => {
 
       this.onRequest()
         .then((arr) =>
-          // console.log(arr),
           this.setState({
             arrImages: arr.hits,
-            // prevState.arrImage > 0
-            //   ? [...prevState.arrImage, arr.hits]
-            //   : [...arr.hits],
-
             status: "resolved",
           })
         )
@@ -46,20 +39,11 @@ class ImageGallery extends Component {
         status: "pending",
       });
       this.onRequest()
-        .then(
-          (arr) =>
-            this.setState({
-              arrImages: [...prevState.arrImages, ...arr.hits],
-              status: "resolved",
-            })
-          // this.setState({
-          //   arrImages:
-          //     this.state.arrImage !== null
-          //       ? [...this.state.arrImage, arr.hits]
-          //       : [...arr.hits],
-
-          //   status: 'resolved',
-          // }),
+        .then((arr) =>
+          this.setState({
+            arrImages: [...prevState.arrImages, ...arr.hits],
+            status: "resolved",
+          })
         )
         .catch((error) => this.setState({ error: error, status: "rejected" }));
     }
@@ -71,15 +55,14 @@ class ImageGallery extends Component {
   }
 
   onRequest = () => {
+    const { requestValue } = this.props;
     return fetch(
-      `https://pixabay.com/api/?q=${this.props.requestValue}&page=${this.state.pageNumber}&key=${this.props.keyApi}&image_type=photo&orientation=horizontal&per_page=12`
+      `https://pixabay.com/api/?q=${requestValue}&page=${this.state.pageNumber}&key=${MY_API_KEY}&image_type=photo&orientation=horizontal&per_page=12`
     ).then((response) => {
       if (response.ok) {
         return response.json();
       }
-      return Promise.reject(
-        new Error(`Ошибка по запросу ${this.props.requestValue}`)
-      );
+      return Promise.reject(new Error(`Ошибка по запросу ${requestValue}`));
     });
   };
 
@@ -87,14 +70,9 @@ class ImageGallery extends Component {
     this.setState((state) => ({
       showModal: !state.showModal,
     }));
-    // console.log(evt.target)
-    // console.log(evt.currentTarget)
-    // this.givDateForModal(evt.currentTarget)
   };
 
   givLinkForModal = (e) => {
-    console.log(e.currentTarget);
-
     const objId = this.state.arrImages.find(
       (obj) => obj.id === Number(e.currentTarget.id)
     );
@@ -110,20 +88,15 @@ class ImageGallery extends Component {
     this.setState((prevState) => ({
       pageNumber: prevState.pageNumber + 1,
     }));
-    // window.scrollTo({
-    //   top: document.documentElement.scrollHeight,
-    //   behavior: 'smooth',
-    // })
-
-    console.log("нажатие кнопки loadMore");
   };
 
   render() {
-    if (this.state.status === "idle") {
+    const { status, error, arrImages, showModal, modalImage } = this.state;
+    if (status === "idle") {
       return <div>The result of your request will be posted here</div>;
     }
 
-    if (this.state.status === "pending") {
+    if (status === "pending") {
       return (
         <Loader
           type="Puff"
@@ -135,11 +108,11 @@ class ImageGallery extends Component {
       );
     }
 
-    if (this.state.status === "rejected") {
-      return <div>{this.state.error}</div>;
+    if (status === "rejected") {
+      return <div>{error}</div>;
     }
 
-    if (this.state.arrImages.length === 0) {
+    if (arrImages.length === 0) {
       return (
         <div>
           There are no results for this request: "{this.props.requestValue}"
@@ -148,21 +121,19 @@ class ImageGallery extends Component {
       );
     }
 
-    if (this.state.status === "resolved") {
+    if (status === "resolved") {
       return (
         <>
           <ul className="ImageGallery">
             <ImageGalleryItem
-              arrImages={this.state.arrImages}
+              arrImages={arrImages}
               givLinkForModal={this.givLinkForModal}
             />
           </ul>
-          {this.state.arrImages.length > 0 && (
-            <Button onLoadMore={this.onLoadMore} />
-          )}
-          {this.state.showModal && (
+          {arrImages.length > 0 && <Button onLoadMore={this.onLoadMore} />}
+          {showModal && (
             <Modal onClose={this.toggleModal}>
-              <img src={this.state.modalImage} alt="" />
+              <img src={modalImage} alt="" />
             </Modal>
           )}
         </>
@@ -171,3 +142,7 @@ class ImageGallery extends Component {
   }
 }
 export default ImageGallery;
+
+ImageGallery.propTypes = {
+  requestValue: PropTypes.string,
+};

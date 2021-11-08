@@ -7,12 +7,9 @@ import ImageGallery from "./components/ImageGallery";
 
 // модалку приспособить
 
-const MY_API_KEY = "23246580-47279d47050c78840bfc8f048";
-
 class App extends Component {
   state = {
     requestValue: "",
-    // pageNumber: 1,
   };
 
   handleFormSubmit = (requestValue) => {
@@ -20,14 +17,11 @@ class App extends Component {
   };
 
   render() {
+    const { requestValue } = this.state;
     return (
       <div className="App">
         <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery
-          requestValue={this.state.requestValue}
-          pageNumber={this.state.pageNumber}
-          keyApi={MY_API_KEY}
-        />
+        <ImageGallery requestValue={requestValue} />
         <ToastContainer autoClose={2500} />
       </div>
     );

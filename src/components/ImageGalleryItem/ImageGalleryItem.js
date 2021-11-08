@@ -1,5 +1,6 @@
+import PropTypes from "prop-types";
+
 function ImageGalleryItem({ arrImages, givLinkForModal }) {
-  console.log(arrImages);
   return arrImages.map((obj) => {
     return (
       <li
@@ -15,3 +16,13 @@ function ImageGalleryItem({ arrImages, givLinkForModal }) {
 }
 
 export default ImageGalleryItem;
+
+ImageGalleryItem.propTypes = {
+  givLinkForModal: PropTypes.func,
+  arrImages: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.number,
+      webformatURL: PropTypes.string,
+    })
+  ),
+};

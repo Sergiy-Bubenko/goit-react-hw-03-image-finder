@@ -1,6 +1,7 @@
 import { Component } from "react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import PropTypes from "prop-types";
 
 class Searchbar extends Component {
   state = {
@@ -14,11 +15,13 @@ class Searchbar extends Component {
   handleSubmit = (event) => {
     event.preventDefault();
 
-    if (this.state.requestValue.trim() === "") {
+    const { requestValue } = this.state;
+
+    if (requestValue.trim() === "") {
       return toast.error("измените запрос", {});
     }
     this.setState({ requestValue: "" });
-    this.props.onSubmit(this.state.requestValue);
+    this.props.onSubmit(requestValue);
   };
 
   render() {
@@ -46,3 +49,7 @@ class Searchbar extends Component {
 }
 
 export default Searchbar;
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func,
+};

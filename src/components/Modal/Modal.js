@@ -2,7 +2,6 @@ import { Component } from "react";
 import { createPortal } from "react-dom";
 
 const modalRoot = document.querySelector("#modal-root");
-console.log(modalRoot);
 
 class Modal extends Component {
   componentDidMount() {
