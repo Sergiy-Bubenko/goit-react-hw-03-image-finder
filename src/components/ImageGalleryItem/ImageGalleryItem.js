@@ -1,6 +1,6 @@
 function ImageGalleryItem({ arrImages, givLinkForModal }) {
   console.log(arrImages);
-  return arrImages.hits.map((obj) => {
+  return arrImages.map((obj) => {
     return (
       <li
         className="ImageGalleryItem"
@@ -8,12 +8,7 @@ function ImageGalleryItem({ arrImages, givLinkForModal }) {
         id={obj.id}
         onClick={givLinkForModal}
       >
-        <img
-          className="ImageGalleryItem-image"
-          src={obj.webformatURL}
-          alt=""
-          // {obj.largeImageURL}
-        />
+        <img className="ImageGalleryItem-image" src={obj.webformatURL} alt="" />
       </li>
     );
   });

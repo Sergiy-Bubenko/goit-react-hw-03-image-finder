@@ -7,7 +7,7 @@ import Modal from "../Modal";
 class ImageGallery extends Component {
   state = {
     pageNumber: 1,
-    arrImages: null,
+    arrImages: [],
     error: null,
     status: "idle",
     showModal: false,
@@ -16,59 +16,72 @@ class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     // console.log(prevProps)
-    // console.log(prevState)
-    // console.log(this.state)
+    // console.log('prevState', prevState)
+    // console.log('this.state', this.state)
 
     if (prevProps.requestValue !== this.props.requestValue) {
       this.setState({
         status: "pending",
-        // arrImages: null
+        pageNumber: 1,
       });
-      this.onRequest();
-      //   fetch(
-      //     `https://pixabay.com/api/?q=${this.props.requestValue}&page=${this.state.pageNumber}&key=${this.props.keyApi}&image_type=photo&orientation=horizontal&per_page=4`,
-      //   )
-      //     .then((response) => {
-      //       if (response.ok) {
-      //         return response.json()
-      //       }
+      // onRequest = () => {
 
-      //       return Promise.reject(
-      //         new Error(`ошибка по запросу ${this.props.requestValue}`),
-      //       )
-      //     })
-      //     .then((arr) => this.setState({ arrImages: arr, status: 'resolved' }))
-      //     .catch((error) => this.setState({ error: error, status: 'rejected' }))
+      this.onRequest()
+        .then((arr) =>
+          // console.log(arr),
+          this.setState({
+            arrImages: arr.hits,
+            // prevState.arrImage > 0
+            //   ? [...prevState.arrImage, arr.hits]
+            //   : [...arr.hits],
+
+            status: "resolved",
+          })
+        )
+        .catch((error) => this.setState({ error: error, status: "rejected" }));
     }
+
+    if (prevState.pageNumber !== this.state.pageNumber) {
+      this.setState({
+        status: "pending",
+      });
+      this.onRequest()
+        .then(
+          (arr) =>
+            this.setState({
+              arrImages: [...prevState.arrImages, ...arr.hits],
+              status: "resolved",
+            })
+          // this.setState({
+          //   arrImages:
+          //     this.state.arrImage !== null
+          //       ? [...this.state.arrImage, arr.hits]
+          //       : [...arr.hits],
+
+          //   status: 'resolved',
+          // }),
+        )
+        .catch((error) => this.setState({ error: error, status: "rejected" }));
+    }
+
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
   }
+
   onRequest = () => {
-    fetch(
-      `https://pixabay.com/api/?q=${this.props.requestValue}&page=${this.state.pageNumber}&key=${this.props.keyApi}&image_type=photo&orientation=horizontal&per_page=4`
-    )
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-
-        return Promise.reject(
-          new Error(`ошибка по запросу ${this.props.requestValue}`)
-        );
-      })
-      .then((arr) =>
-        this.setState({
-          arrImages: arr,
-          status: "resolved",
-        })
-      )
-      .catch((error) => this.setState({ error: error, status: "rejected" }));
+    return fetch(
+      `https://pixabay.com/api/?q=${this.props.requestValue}&page=${this.state.pageNumber}&key=${this.props.keyApi}&image_type=photo&orientation=horizontal&per_page=12`
+    ).then((response) => {
+      if (response.ok) {
+        return response.json();
+      }
+      return Promise.reject(
+        new Error(`Ошибка по запросу ${this.props.requestValue}`)
+      );
+    });
   };
-
-  // onLoadMore = () => {
-  //   this.onRequest()
-  //   this.setState((prevState) => ({
-  //     pageNumber: prevState.pageNumber + 1,
-  //   }))
-  // }
 
   toggleModal = () => {
     this.setState((state) => ({
@@ -82,7 +95,7 @@ class ImageGallery extends Component {
   givLinkForModal = (e) => {
     console.log(e.currentTarget);
 
-    const objId = this.state.arrImages.hits.find(
+    const objId = this.state.arrImages.find(
       (obj) => obj.id === Number(e.currentTarget.id)
     );
 
@@ -93,10 +106,19 @@ class ImageGallery extends Component {
     this.toggleModal();
   };
 
-  // givLinkModal = () => {}
+  onLoadMore = () => {
+    this.setState((prevState) => ({
+      pageNumber: prevState.pageNumber + 1,
+    }));
+    // window.scrollTo({
+    //   top: document.documentElement.scrollHeight,
+    //   behavior: 'smooth',
+    // })
+
+    console.log("нажатие кнопки loadMore");
+  };
 
   render() {
-    // console.log(this.state.arrImages)
     if (this.state.status === "idle") {
       return <div>The result of your request will be posted here</div>;
     }
@@ -114,11 +136,10 @@ class ImageGallery extends Component {
     }
 
     if (this.state.status === "rejected") {
-      console.log(this.state.error);
       return <div>{this.state.error}</div>;
     }
 
-    if (this.state.arrImages.hits.length === 0) {
+    if (this.state.arrImages.length === 0) {
       return (
         <div>
           There are no results for this request: "{this.props.requestValue}"
@@ -136,7 +157,9 @@ class ImageGallery extends Component {
               givLinkForModal={this.givLinkForModal}
             />
           </ul>
-          {this.state.arrImages.hits.length > 0 && <Button />}
+          {this.state.arrImages.length > 0 && (
+            <Button onLoadMore={this.onLoadMore} />
+          )}
           {this.state.showModal && (
             <Modal onClose={this.toggleModal}>
               <img src={this.state.modalImage} alt="" />
